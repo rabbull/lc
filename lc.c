@@ -17,14 +17,17 @@ _Bool is_empty_line(char* line);
 
 int main(int argc, char** argv) {
 	if (argc < 2) {
-		char* warn = "Usage: lc FILENAME\n";
-		write(fileno(stderr), warn, strlen(warn));
+		fprintf(stderr, "Usage: lc FILENAME\n");
 		return -1;
 	}
-	int fd = open(argv[1], O_RDONLY);
+	int fd;
+	if (argv[1][0] == '-' && argv[1][1] == 0) {
+		fd = fileno(stdin);
+	} else {
+		fd = open(argv[1], O_RDONLY);
+	}
 	if (fd < 0) {
-		char* warn = "Failed to open file.\n";
-		write(fileno(stderr), warn, strlen(warn));
+		fprintf(stderr, "Failed to open file.\n");
 		return -1;
 	}
 	long long count[2] = {0};
@@ -36,7 +39,7 @@ int main(int argc, char** argv) {
 		}
 		count[is_empty_line(buf)] += 1;
 	}
-	printf("%lld %lld\n", count[0], count[1]);
+	printf("%lld %lld %lld\n", count[0] + count[1], count[0], count[1]);
 	free(buf);
 	return 0;
 }
